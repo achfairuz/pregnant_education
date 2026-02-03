@@ -16,37 +16,40 @@ Widget nutritionCapsule({
       color: bottomColor,
     ),
     child: Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         // TOP
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          height: 100 * 0.4,
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 100 * 0.1),
           decoration: BoxDecoration(
             color: topColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(40)),
           ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: labelColor,
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: labelColor,
+              ),
             ),
           ),
         ),
-
-        const Spacer(),
-
         // BOTTOM
         Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text(
-            value,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 13,
-              color: valueColor,
+          padding: const EdgeInsets.only(bottom: 100*0.25, left: 100 * 0.05, right: 100 * 0.05),
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: valueColor,
+              ),
             ),
           ),
         ),

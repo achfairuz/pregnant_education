@@ -11,6 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      title: 'Maternia',
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
     );
