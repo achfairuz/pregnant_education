@@ -194,26 +194,28 @@ class _ScanPageState extends State<ScanPage> {
                             ),
                             SizedBox(height: 10),
                             Text(bahan['description'] ?? ""),
-                            SizedBox(height: 24),
-                            Center(
-                              child: SizedBox(
-                                height: 100,
-                                child: ListView.separated(
-                                  shrinkWrap: true,
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: (bahan['capsule_data'] as List).length,
-                                  separatorBuilder: (context, index) =>
-                                      SizedBox(width: 4),
-                                  itemBuilder: (context, index) {
-                                    final capsule = bahan['capsule_data'][index];
-                                    return nutritionCapsule(
-                                      label: capsule['name'],
-                                      value: capsule['value'],
-                                    );
-                                  },
+                            if( bahan['capsule_data'] != null && (bahan['capsule_data'] as List).isNotEmpty) ...[
+                              SizedBox(height: 24),
+                              Center(
+                                child: SizedBox(
+                                  height: 100,
+                                  child: ListView.separated(
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: (bahan['capsule_data'] as List).length,
+                                    separatorBuilder: (context, index) =>
+                                        SizedBox(width: 4),
+                                    itemBuilder: (context, index) {
+                                      final capsule = bahan['capsule_data'][index];
+                                      return nutritionCapsule(
+                                        label: capsule['name'],
+                                        value: capsule['value'],
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
+                            ],
                             SizedBox(height: 40),
                           ],
                         ),
@@ -262,13 +264,13 @@ class _ScanPageState extends State<ScanPage> {
                   Transform(
                     transform: Matrix4.translationValues(0.0, -20.0, 0.0),
                     child: CircleAvatar(
-                      radius: 25,
-                      backgroundColor: Colors.green[900],
+                      radius: 22,
+                      backgroundColor: Colors.yellow[800],
                       child: Text(
                         '${capsule['percentage']}%',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.yellow[200],
+                          color: Colors.white,
                         ),
                       ),
                     ),
