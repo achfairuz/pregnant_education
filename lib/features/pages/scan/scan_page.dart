@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pregnant_education/core/enums/qr_code_type_enum.dart';
+import 'package:pregnant_education/shared/helpers/tts_helper.dart';
+import 'package:pregnant_education/shared/widgets/nutrition_capsule_widget.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 
 class ScanPage extends StatefulWidget {
@@ -64,6 +66,8 @@ class _ScanPageState extends State<ScanPage> {
               children: [
                 _buildQrView(context),
                 if (detectedQrType != null) _build3dView(),
+                if (detectedQrType != null) _buildButtonMenu(),
+                if (detectedQrType != null) _buildCapsuleMenu(),
                 if (detectedQrType != null) _buildControls(),
               ],
             ),
@@ -72,11 +76,11 @@ class _ScanPageState extends State<ScanPage> {
 
   Widget _buildQrView(BuildContext context) {
     var scanArea = MediaQuery.of(context).size.height * 0.4;
-        
+
     // Only show overlay if NO QR is detected (and we are scanning)
     // When 3D model is shown, overlay is removed (passed as null or empty shape)
     // However, QRView overlay parameter is nullable.
-    
+
     return QRView(
       key: qrKey,
       onQRViewCreated: _onQRViewCreated,
@@ -105,10 +109,11 @@ class _ScanPageState extends State<ScanPage> {
           setState(() {
             detectedQrType = type;
           });
-          // Do NOT pause camera to keep the AR illusion (live background)
-          // controller.pauseCamera(); 
         } catch (e) {
           debugPrint('Invalid QR Code: ${scanData.code}');
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('QR Code Tidak Valid')));
         }
       }
     });
@@ -116,9 +121,9 @@ class _ScanPageState extends State<ScanPage> {
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
     if (!p) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('no Permission')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Izin tidak diberikan')));
     }
   }
 
@@ -132,7 +137,146 @@ class _ScanPageState extends State<ScanPage> {
           progressBarColor: Colors.orange,
           activeGestureInterceptor: true,
           enableTouch: true,
-          // Note: Background transparency depends on the 3D model and viewer implementation
+          onLoad: (modelAddress) {
+            if (detectedQrType != null) {
+              TtsHelper.speak(detectedQrType!.getNarration());
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildButtonMenu() {
+    return Positioned(
+      top: MediaQuery.of(context).padding.top + 16,
+      left: 0,
+      right: 0,
+      child: SizedBox(
+        height: 45,
+        child: ListView.separated(
+          shrinkWrap: true,
+          itemCount: detectedQrType!.getBahan().length,
+          scrollDirection: Axis.horizontal,
+          separatorBuilder: (context, index) => SizedBox(width: 0),
+          itemBuilder: (context, index) {
+            final bahan = detectedQrType!.getBahan()[index];
+            return Padding(
+              padding: EdgeInsets.only(left: index == 0 ? 12 : 4, right: index == detectedQrType!.getBahan().length - 1 ? 12 : 4),
+              child: ElevatedButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    useRootNavigator: true,
+                    builder: (context) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.start,
+                          children: [
+                            Center(
+                              child: Container(
+                                width: 50,
+                                height: 5,
+                                margin: const EdgeInsets.only(bottom: 16),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                            Text(
+                              bahan['name'],
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Text(bahan['description'] ?? ""),
+                            SizedBox(height: 24),
+                            Center(
+                              child: SizedBox(
+                                height: 100,
+                                child: ListView.separated(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: (bahan['capsule_data'] as List).length,
+                                  separatorBuilder: (context, index) =>
+                                      SizedBox(width: 4),
+                                  itemBuilder: (context, index) {
+                                    final capsule = bahan['capsule_data'][index];
+                                    return nutritionCapsule(
+                                      label: capsule['name'],
+                                      value: capsule['value'],
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 40),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(bahan['icon'], fit: BoxFit.contain,),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCapsuleMenu() {
+    return Positioned(
+      bottom: 60,
+      left: 0,
+      right: 0,
+      child: Center(
+        child: SizedBox(
+          height: 150,
+          child: ListView.separated(
+            physics: NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemCount: detectedQrType!.getCapsuleData().length,
+            scrollDirection: Axis.horizontal,
+            separatorBuilder: (context, index) => SizedBox(width: 4),
+            itemBuilder: (context, index) {
+              final capsule = detectedQrType!.getCapsuleData()[index];
+              return Column(
+                children: [
+                  nutritionCapsule(
+                    label: capsule['name'],
+                    value: capsule['value'],
+                  ),
+                  Transform(
+                    transform: Matrix4.translationValues(0.0, -20.0, 0.0),
+                    child: CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.green[900],
+                      child: Text(
+                        '${capsule['percentage']}%',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.yellow[200],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -140,14 +284,14 @@ class _ScanPageState extends State<ScanPage> {
 
   Widget _buildControls() {
     return Positioned(
-      bottom: 30,
+      bottom: 20,
       left: 0,
       right: 0,
       child: Center(
         child: ElevatedButton.icon(
           onPressed: _resetScan,
           icon: const Icon(Icons.qr_code_scanner),
-          label: const Text('Scan Again'),
+          label: const Text('Scan Lagi'),
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             foregroundColor: Colors.black,

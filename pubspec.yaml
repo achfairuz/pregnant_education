@@ -41,6 +41,7 @@ dependencies:
   flutter_3d_controller: ^2.3.0
   qr_code_scanner_plus: ^2.0.14
   permission_handler: ^12.0.1
+  flutter_tts: ^4.2.5
 
 dev_dependencies:
   flutter_test:
@@ -65,8 +66,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/icons/icon_education.png
-    - assets/images/icons/icon_recipe.png
+    - assets/images/icons/
     - assets/food_recipe/
     - assets/icon_category_content/
     - assets/3d_models/
