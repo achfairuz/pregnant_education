@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
+import 'package:flutter/services.dart';
+import 'package:saver_gallery/saver_gallery.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -421,16 +424,47 @@ class _ScanPageState extends State<ScanPage> {
   }
 
   void _showGuideSheet() {
+    final downloadItems = [
+      {
+        'label': 'Menu 1',
+        'asset': 'assets/images/qrcode/menu_1.png',
+        'fileName': 'menu_1_qr',
+      },
+      {
+        'label': 'Menu 2',
+        'asset': 'assets/images/qrcode/menu_2.png',
+        'fileName': 'menu_2_qr',
+      },
+      {
+        'label': 'Menu 3',
+        'asset': 'assets/images/qrcode/menu_3.png',
+        'fileName': 'menu_3_qr',
+      },
+      {
+        'label': 'Nagasari',
+        'asset': 'assets/images/qrcode/nagasari.png',
+        'fileName': 'nagasari_qr',
+      },
+      {
+        'label': 'Bubur Kacang Ijo',
+        'asset': 'assets/images/qrcode/bubur_kacang_ijo.png',
+        'fileName': 'bubur_kacang_ijo_qr',
+      },
+    ];
+
     showModalBottomSheet(
       context: context,
       useRootNavigator: true,
+      enableDrag: true,
+      scrollControlDisabledMaxHeightRatio: 0.9,
+      isScrollControlled: true,
       builder: (context) {
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Wrap(
             crossAxisAlignment: WrapCrossAlignment.start,
-            children: const [
-              Center(
+            children: [
+              const Center(
                 child: SizedBox(
                   width: 50,
                   height: 5,
@@ -442,25 +476,99 @@ class _ScanPageState extends State<ScanPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'Petunjuk Penggunaan',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 12),
-              Text('1. Arahkan kamera ke QR code hingga terdeteksi.'),
-              SizedBox(height: 8),
-              Text('2. Anda bisa memilih gambar QR dari galeri.'),
-              SizedBox(height: 8),
-              Text('3. Setelah terdeteksi, informasi akan tampil otomatis.'),
-              SizedBox(height: 8),
-              Text('4. Tekan "Scan Lagi" untuk memindai ulang.'),
-              SizedBox(height: 24),
+              const SizedBox(height: 12),
+              const Text(
+                'Klik tombol Download di bawah ini untuk melihat visualisasi Isi Piringku yang mudah dipahami dan bisa langsung diterapkan sehari-hari!',
+              ),
+              const SizedBox(height: 12),
+              ...downloadItems.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item['label'] as String,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          _downloadQrAsset(
+                            assetPath: item['asset'] as String,
+                            fileName: item['fileName'] as String,
+                          );
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('Download'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              const Text('Berikut langkah-langkah penggunaan fitur scan:'),
+              const SizedBox(height: 8),
+              const Text('1. Download QRCode menu yang ingin dilihat.'),
+              const SizedBox(height: 8),
+              const Text(
+                '2. Scan QR yang telah di download atau klik tombol galeri dan pilih QRCode yang telah di download.',
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                '3. Nikmati visualisasi Isi Piringku dalam tampilan Augmented Reality.',
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         );
       },
     );
+  }
+
+  Future<void> _downloadQrAsset({
+    required String assetPath,
+    required String fileName,
+  }) async {
+    if (!await _ensureGalleryPermission()) {
+      return;
+    }
+
+    try {
+      final byteData = await rootBundle.load(assetPath);
+      final Uint8List bytes = byteData.buffer.asUint8List();
+      final result = await SaverGallery.saveImage(
+        bytes,
+        fileName: '$fileName.png',
+        androidRelativePath: 'Pictures/pregnant_education',
+        skipIfExists: false,
+      );
+      final isSuccess = result.isSuccess == true;
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isSuccess ? 'Gambar berhasil disimpan' : 'Gagal menyimpan gambar',
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Failed to save QR asset: $e');
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Gagal menyimpan gambar')));
+    }
   }
 
   void _resetScan() {
