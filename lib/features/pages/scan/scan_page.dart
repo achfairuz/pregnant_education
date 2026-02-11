@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:google_mlkit_barcode_scanning/google_mlkit_barcode_scanning.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pregnant_education/core/enums/qr_code_type_enum.dart';
 import 'package:pregnant_education/shared/helpers/tts_helper.dart';
@@ -20,6 +22,8 @@ class _ScanPageState extends State<ScanPage> {
   QRViewController? controller;
   QrCodeType? detectedQrType;
   Flutter3DController? _3dController;
+  final ImagePicker _imagePicker = ImagePicker();
+  final BarcodeScanner _barcodeScanner = BarcodeScanner();
   bool isPermissionGranted = false;
 
   @override
@@ -65,6 +69,7 @@ class _ScanPageState extends State<ScanPage> {
           : Stack(
               children: [
                 _buildQrView(context),
+                if (detectedQrType == null) _buildBottomActions(),
                 if (detectedQrType != null) _build3dView(),
                 if (detectedQrType != null) _buildButtonMenu(),
                 if (detectedQrType != null) _buildCapsuleMenu(),
@@ -104,19 +109,29 @@ class _ScanPageState extends State<ScanPage> {
     controller.scannedDataStream.listen((scanData) {
       // If we already detected a type, ignore further scans until reset
       if (detectedQrType == null && scanData.code != null) {
-        try {
-          final type = QrCodeTypeExtension.fromString(scanData.code!);
-          setState(() {
-            detectedQrType = type;
-          });
-        } catch (e) {
-          debugPrint('Invalid QR Code: ${scanData.code}');
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('QR Code Tidak Valid')));
-        }
+        _handleQrCode(scanData.code!);
       }
     });
+  }
+
+  Future<void> _handleQrCode(String code) async {
+    try {
+      final type = QrCodeTypeExtension.fromString(code);
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        detectedQrType = type;
+      });
+    } catch (e) {
+      debugPrint('Invalid QR Code: $code');
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('QR Code Tidak Valid')));
+    }
   }
 
   void _onPermissionSet(BuildContext context, QRViewController ctrl, bool p) {
@@ -139,7 +154,9 @@ class _ScanPageState extends State<ScanPage> {
           enableTouch: true,
           onLoad: (modelAddress) {
             if (detectedQrType != null) {
-              TtsHelper.speak(detectedQrType!.getNarration());
+              Future.delayed(const Duration(seconds: 3), () {
+                TtsHelper.speak(detectedQrType!.getNarration());
+              });
             }
           },
         ),
@@ -162,7 +179,10 @@ class _ScanPageState extends State<ScanPage> {
           itemBuilder: (context, index) {
             final bahan = detectedQrType!.getBahan()[index];
             return Padding(
-              padding: EdgeInsets.only(left: index == 0 ? 12 : 4, right: index == detectedQrType!.getBahan().length - 1 ? 12 : 4),
+              padding: EdgeInsets.only(
+                left: index == 0 ? 12 : 4,
+                right: index == detectedQrType!.getBahan().length - 1 ? 12 : 4,
+              ),
               child: ElevatedButton(
                 onPressed: () {
                   showModalBottomSheet(
@@ -194,7 +214,8 @@ class _ScanPageState extends State<ScanPage> {
                             ),
                             SizedBox(height: 10),
                             Text(bahan['description'] ?? ""),
-                            if( bahan['capsule_data'] != null && (bahan['capsule_data'] as List).isNotEmpty) ...[
+                            if (bahan['capsule_data'] != null &&
+                                (bahan['capsule_data'] as List).isNotEmpty) ...[
                               SizedBox(height: 24),
                               Center(
                                 child: SizedBox(
@@ -202,11 +223,13 @@ class _ScanPageState extends State<ScanPage> {
                                   child: ListView.separated(
                                     shrinkWrap: true,
                                     scrollDirection: Axis.horizontal,
-                                    itemCount: (bahan['capsule_data'] as List).length,
+                                    itemCount:
+                                        (bahan['capsule_data'] as List).length,
                                     separatorBuilder: (context, index) =>
                                         SizedBox(width: 4),
                                     itemBuilder: (context, index) {
-                                      final capsule = bahan['capsule_data'][index];
+                                      final capsule =
+                                          bahan['capsule_data'][index];
                                       return nutritionCapsule(
                                         label: capsule['name'],
                                         value: capsule['value'],
@@ -229,7 +252,7 @@ class _ScanPageState extends State<ScanPage> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Image.asset(bahan['icon'], fit: BoxFit.contain,),
+                  child: Image.asset(bahan['icon'], fit: BoxFit.contain),
                 ),
               ),
             );
@@ -268,10 +291,7 @@ class _ScanPageState extends State<ScanPage> {
                       backgroundColor: Colors.yellow[800],
                       child: Text(
                         '${capsule['percentage']}%',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.white,
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.white),
                       ),
                     ),
                   ),
@@ -303,6 +323,146 @@ class _ScanPageState extends State<ScanPage> {
     );
   }
 
+  Widget _buildBottomActions() {
+    return Positioned(
+      bottom: 20,
+      left: 16,
+      right: 16,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          ElevatedButton.icon(
+            onPressed: _pickFromGallery,
+            icon: const Icon(Icons.photo_library),
+            label: const Text('Galeri'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: _showGuideSheet,
+            icon: const Icon(Icons.info_outline),
+            label: const Text('Petunjuk'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool> _ensureGalleryPermission() async {
+    PermissionStatus status;
+    if (Platform.isIOS) {
+      status = await Permission.photos.request();
+    } else if (Platform.isAndroid) {
+      final photosStatus = await Permission.photos.request();
+      status = photosStatus.isGranted
+          ? photosStatus
+          : await Permission.storage.request();
+    } else {
+      status = await Permission.storage.request();
+    }
+
+    if (status.isGranted) {
+      return true;
+    }
+
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+    }
+
+    if (!mounted) {
+      return false;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Izin galeri tidak diberikan')),
+    );
+    return false;
+  }
+
+  Future<void> _pickFromGallery() async {
+    if (!await _ensureGalleryPermission()) {
+      return;
+    }
+
+    final image = await _imagePicker.pickImage(source: ImageSource.gallery);
+    if (image == null) {
+      return;
+    }
+
+    try {
+      final inputImage = InputImage.fromFilePath(image.path);
+      final barcodes = await _barcodeScanner.processImage(inputImage);
+      final code = barcodes.isNotEmpty ? barcodes.first.rawValue : null;
+      if (code == null || code.isEmpty) {
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('QR tidak ditemukan di gambar')),
+        );
+        return;
+      }
+
+      await _handleQrCode(code);
+    } catch (e) {
+      debugPrint('Failed to scan from gallery: $e');
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal memindai dari galeri')),
+      );
+    }
+  }
+
+  void _showGuideSheet() {
+    showModalBottomSheet(
+      context: context,
+      useRootNavigator: true,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Wrap(
+            crossAxisAlignment: WrapCrossAlignment.start,
+            children: const [
+              Center(
+                child: SizedBox(
+                  width: 50,
+                  height: 5,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Color(0xFFBDBDBD),
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Petunjuk Penggunaan',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 12),
+              Text('1. Arahkan kamera ke QR code hingga terdeteksi.'),
+              SizedBox(height: 8),
+              Text('2. Anda bisa memilih gambar QR dari galeri.'),
+              SizedBox(height: 8),
+              Text('3. Setelah terdeteksi, informasi akan tampil otomatis.'),
+              SizedBox(height: 8),
+              Text('4. Tekan "Scan Lagi" untuk memindai ulang.'),
+              SizedBox(height: 24),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void _resetScan() {
     setState(() {
       detectedQrType = null;
@@ -314,6 +474,7 @@ class _ScanPageState extends State<ScanPage> {
   @override
   void dispose() {
     controller?.dispose();
+    _barcodeScanner.close();
     super.dispose();
   }
 }
