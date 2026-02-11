@@ -2,6 +2,9 @@ import 'package:pregnant_education/core/constants/app_assets.dart';
 
 class MenuData {
   // ======= narration ==========
+  static String narrationMenu1() {
+    return """Ibu hamil nggak perlu makanan mahal untuk punya bayi sehat dan tinggi. Makan lengkap tiap hari, bayi tumbuh sehat, cerdas, dan kuat sejak dini.""";
+  }
   static String narrationMenu2() {
     return """Sepiring gizi, bekal tumbuh kembang si kecil. Murah, sederhana, tapi dampaknya besar untuk masa depan buah hati""";
   }
@@ -17,6 +20,70 @@ class MenuData {
   // ======= narration ==========
   
   // ======= bahan ==========
+  static List<Map> bahanMenu1() {
+    return [
+      {
+        "name": "Nasi daun jeruk",
+        "description":
+            """1 porsi = 150 gr atau 1 gelas\n\nsumber karbohidrat yang berfungsi sebagai penyedia energi utama bagi ibu hamil. Energi yang cukup membantu ibu menjalani aktivitas sehari-hari tanpa mudah lelah serta mendukung proses pertumbuhan janin secara optimal sejak dalam kandungan.""",
+        "capsule_data": [
+          {"name": "Energi", "value": "275 kkal"},
+          {"name": "Protein", "value": "4,7 gram"},
+          {"name": "Lemak", "value": " 5,3 gram"},
+          {"name": "Karbohidrat", "value": "50,7 gram"},
+        ],
+        "icon": AppAssets.iconNasiDaunJeruk,
+      },
+      {
+        "name": "Tongkol suwir",
+        "description":
+            """1 porsi = 40 gr atau 1 potong sedang\n\nmengandung protein hewani, zat besi, dan asam lemak omega-3 yang penting untuk pembentukan jaringan tubuh dan perkembangan otak janin. Kandungan zat besinya membantu mencegah anemia pada ibu hamil, sehingga suplai oksigen ke janin tetap terjaga.""",
+        "capsule_data": [
+          {"name": "Energi", "value": "80,1 kkal"},
+          {"name": "Protein", "value": "8,4 gram"},
+          {"name": "Lemak", "value": "4,6 gram"},
+          {"name": "Karbohidrat", "value": "1 gram"},
+        ],
+        "icon": AppAssets.iconTongkol,
+      },
+      {
+        "name": "Tempe orek",
+        "description":
+            """1 porsi = 50 gr atau 2 potong sedang\n\nsumber protein nabati yang mudah dicerna serta mengandung kalsium dan zat besi. Konsumsi tempe membantu pembentukan tulang janin dan mendukung peningkatan berat badan janin secara sehat.""",
+        "capsule_data": [
+          {"name": "Energi", "value": "87,4 kkal"},
+          {"name": "Protein", "value": "6,6 gram"},
+          {"name": "Lemak", "value": "4,1 gram"},
+          {"name": "Karbohidrat", "value": "7,8 gram"},
+        ],
+        "icon": AppAssets.iconTempe,
+      },
+      {
+        "name": "Tumis kacang panjang",
+        "description":
+            """1 porsi = 100 gr atau 1 gelas\n\nkaya akan asam folat dan serat. Asam folat berperan penting dalam pembentukan sistem saraf dan otak janin, sementara serat membantu menjaga kesehatan pencernaan ibu hamil.""",
+        "capsule_data": [
+          {"name": "Energi", "value": "50 kkal"},
+          {"name": "Protein", "value": "2,5 gram"},
+          {"name": "Lemak", "value": "3,5 gram"},
+          {"name": "Karbohidrat", "value": "5,5 gram"},
+        ],
+        "icon": AppAssets.iconKacangPanjang,
+      },
+      {
+        "name": "Buah pisang",
+        "description":
+            """1 porsi = 100 gr atau 1 buah\n\nmengandung kalium dan vitamin B6 yang membantu mengurangi keluhan kram otot dan mual selama kehamilan. Kondisi ibu yang sehat dan nyaman akan mendukung penyerapan nutrisi yang lebih baik bagi janin.""",
+        "capsule_data": [
+          {"name": "Energi", "value": "120 kkal"},
+          {"name": "Protein", "value": "1,2 gram"},
+          {"name": "Lemak", "value": "0,2 gram"},
+          {"name": "Karbohidrat", "value": "31,8 gram"},
+        ],
+        "icon": AppAssets.iconJeruk,
+      },
+    ];
+  }
   static List<Map> bahanMenu2() {
     return [
       {
@@ -168,6 +235,14 @@ class MenuData {
   // ======= bahan ==========
 
   // ======== capsule data ==========
+  static List<Map> capsuleDataMenu1() {
+    return [
+      {"name": "Energi", "value": "612,4 kkal", "percentage": "24"},
+      {"name": "Protein", "value": "23,4 gram", "percentage": "33"},
+      {"name": "Lemak", "value": "17,7 gram", "percentage": "20"},
+      {"name": "Karbohidrat", "value": "96,8 gram", "percentage": "25"},
+    ];
+  }
   static List<Map> capsuleDataMenu2() {
     return [
       {"name": "Energi", "value": "751,4 kkal", "percentage": "30"},

@@ -1,15 +1,13 @@
 import 'package:pregnant_education/core/constants/app_assets.dart';
 import 'package:pregnant_education/features/data/models/scan/menu_data.dart';
 
-enum QrCodeType { nasiAyam, nasiLele, menu2, menu3, nagasari, buburKacangIjo }
+enum QrCodeType { menu1, menu2, menu3, nagasari, buburKacangIjo }
 
 extension QrCodeTypeExtension on QrCodeType {
   String get stringValue {
     switch (this) {
-      case QrCodeType.nasiAyam:
-        return 'nasi_ayam';
-      case QrCodeType.nasiLele:
-        return 'nasi_lele';
+      case QrCodeType.menu1:
+        return 'menu_1';
       case QrCodeType.menu2:
         return 'menu_2';
       case QrCodeType.menu3:
@@ -23,10 +21,8 @@ extension QrCodeTypeExtension on QrCodeType {
 
   static QrCodeType fromString(String value) {
     switch (value) {
-      case 'https://q.me-qr.com/2z12sjrd':
-        return QrCodeType.nasiAyam;
-      case 'nasi_lele':
-        return QrCodeType.nasiLele;
+      case 'menu_1':
+        return QrCodeType.menu1;
       case 'menu_2':
         return QrCodeType.menu2;
       case 'menu_3':
@@ -42,10 +38,8 @@ extension QrCodeTypeExtension on QrCodeType {
 
   String getModelPath() {
     switch (this) {
-      case QrCodeType.nasiAyam:
+      case QrCodeType.menu1:
         return AppAssets.modelMenu1;
-      case QrCodeType.nasiLele:
-        return AppAssets.modelNasiLele;
       case QrCodeType.menu2:
         return AppAssets.modelMenu2;
       case QrCodeType.menu3:
@@ -59,10 +53,8 @@ extension QrCodeTypeExtension on QrCodeType {
 
   String getNarration() {
     switch (this) {
-      case QrCodeType.nasiAyam:
-        return "";
-      case QrCodeType.nasiLele:
-        return "";
+      case QrCodeType.menu1:
+        return MenuData.narrationMenu1();
       case QrCodeType.menu2:
         return MenuData.narrationMenu2();
       case QrCodeType.menu3:
@@ -76,10 +68,8 @@ extension QrCodeTypeExtension on QrCodeType {
 
   List<Map> getCapsuleData() {
     switch (this) {
-      case QrCodeType.nasiAyam:
-        return [];
-      case QrCodeType.nasiLele:
-        return [];
+      case QrCodeType.menu1:
+        return MenuData.capsuleDataMenu1();
       case QrCodeType.menu2:
         return MenuData.capsuleDataMenu2();
       case QrCodeType.menu3:
@@ -93,10 +83,8 @@ extension QrCodeTypeExtension on QrCodeType {
 
   List<Map> getBahan() {
     switch (this) {
-      case QrCodeType.nasiAyam:
-        return [];
-      case QrCodeType.nasiLele:
-        return [];
+      case QrCodeType.menu1:
+        return MenuData.bahanMenu1();
       case QrCodeType.menu2:
         return MenuData.bahanMenu2();
       case QrCodeType.menu3:
