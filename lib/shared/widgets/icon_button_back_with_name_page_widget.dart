@@ -13,7 +13,7 @@ Widget iconButtonBackWithNamePageWidget({
         },
         icon: Icon(Icons.arrow_back),
       ),
-      Text(pageName, style: AppTextStyle.subheading),
+      Expanded(child: Text(pageName, style: AppTextStyle.subheading, overflow: TextOverflow.ellipsis)),
     ],
   );
 }

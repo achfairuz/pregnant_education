@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:pregnant_education/core/themes/app_colors.dart';
@@ -61,6 +59,7 @@ class _CategoryMenusGridState extends State<CategoryMenusGrid> {
                 name: item['name'] ?? '',
                 imageUrl: item['imageUrl'] ?? '',
                 routePrefix: widget.routePrefix,
+                data: item,
               );
             },
           ),
@@ -75,19 +74,21 @@ class _CategoryCard extends StatelessWidget {
   final String name;
   final String imageUrl;
   final String routePrefix;
+  final Map<String, dynamic>  data;
 
   const _CategoryCard({
     required this.id,
     required this.name,
     required this.imageUrl,
     required this.routePrefix,
+    required this.data,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        context.push('$routePrefix/$id/$name');
+        context.push('$routePrefix/$id/$name', extra: {'data': data});
       },
       child: Card(
         surfaceTintColor: AppColors.white,
@@ -98,14 +99,7 @@ class _CategoryCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                imageUrl,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.image_not_supported),
-              ),
+              _buildImage(),
               const SizedBox(height: AppSizes.medium),
               Text(
                 name,
@@ -117,5 +111,47 @@ class _CategoryCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildImage() {
+    // Check if imageUrl is a network URL or local asset
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return Image.network(
+        imageUrl,
+        width: 60,
+        height: 60,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return SizedBox(
+            width: 60,
+            height: 60,
+            child: Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded /
+                        loadingProgress.expectedTotalBytes!
+                    : null,
+              ),
+            ),
+          );
+        },
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.image_not_supported,
+          size: 60,
+        ),
+      );
+    } else {
+      return Image.asset(
+        imageUrl,
+        width: 60,
+        height: 60,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.image_not_supported,
+          size: 60,
+        ),
+      );
+    }
   }
 }

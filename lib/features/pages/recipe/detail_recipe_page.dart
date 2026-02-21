@@ -3,7 +3,7 @@ import 'package:pregnant_education/core/themes/app_colors.dart';
 import 'package:pregnant_education/core/themes/app_padding.dart';
 import 'package:pregnant_education/core/themes/app_sizes.dart';
 import 'package:pregnant_education/core/themes/app_text_style.dart';
-import 'package:pregnant_education/features/data/dummy/recipe/recipe_data_dummy.dart';
+import 'package:pregnant_education/features/data/repositories/recipe/recipe_repository.dart';
 import 'package:pregnant_education/shared/widgets/icon_button_back_with_name_page_widget.dart';
 import 'package:pregnant_education/shared/widgets/icon_text_row_widget.dart';
 import 'package:pregnant_education/shared/widgets/nutrition_capsule_widget.dart';
@@ -11,20 +11,48 @@ import 'package:pregnant_education/shared/widgets/text_list_section_widget.dart'
 
 class DetailRecipePage extends StatefulWidget {
   final String id;
-  const DetailRecipePage({super.key, required this.id});
+  final Map<String, dynamic> data;
+  const DetailRecipePage({super.key, required this.id, required this.data});
 
   @override
   State<DetailRecipePage> createState() => _DetailRecipePageState();
 }
 
 class _DetailRecipePageState extends State<DetailRecipePage> {
+  final RecipeRepository _repository = RecipeRepository();
+  Map<String, dynamic>? _recipeData;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRecipeDetail();
+  }
+
+  Future<void> _loadRecipeDetail() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      final recipeDetail = await _repository.getRecipeDetail(widget.id);
+
+      setState(() {
+        _recipeData = recipeDetail;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Gagal memuat detail resep: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final data = recipeDataDummy.firstWhere(
-      (recipe) => recipe["id"] == widget.id,
-    );
-
-    final nutrition = data["nutrition"] as Map<String, dynamic>;
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -38,46 +66,95 @@ class _DetailRecipePageState extends State<DetailRecipePage> {
                   pageName: "Detail Recipe",
                 ),
                 SizedBox(height: AppSizes.base),
-                _headerRecipe(
-                  imageUrl: data["imageUrl"],
-                  title: data["title"],
-                  portion: data["portion"],
-                  duration: data["duration"],
-                ),
-                SizedBox(height: AppSizes.large),
-                textListSection(
-                  items: data["ingredients"] as List<String>,
-                  title: "Bahan-bahan",
-                ),
-                SizedBox(height: AppSizes.base),
-                textListSection(
-                  items: data["steps"] as List<String>,
-                  title: "Langkah-langkah",
-                  numbered: true,
-                ),
-
-                SizedBox(height: AppSizes.doubleExtraLarge),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: nutrition.values
-                        .map<Widget>(
-                          (item) => Padding(
-                            padding: const EdgeInsets.only(right: 12),
-                            child: nutritionCapsule(
-                              label: item['label'],
-                              value: item['value'],
-                            ),
+                if (_isLoading)
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32.0),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                else if (_errorMessage != null)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        children: [
+                          Text(
+                            _errorMessage!,
+                            style: const TextStyle(color: Colors.red),
+                            textAlign: TextAlign.center,
                           ),
-                        )
-                        .toList(),
-                  ),
-                ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _loadRecipeDetail,
+                            child: const Text('Coba Lagi'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else if (_recipeData != null)
+                  _buildRecipeContent(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildRecipeContent() {
+    // Parse ingredients from API response
+    final ingredients = (_recipeData!["ingredients"] as List<dynamic>)
+        .map((item) => item.ingredient as String)
+        .toList();
+
+    // Parse steps from API response
+    final steps = (_recipeData!["steps"] as List<dynamic>)
+        .map((item) => item.step as String)
+        .toList();
+
+    // Parse nutritions from API response
+    final nutritions = _recipeData!["nutritions"] as List<dynamic>;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _headerRecipe(
+          imageUrl: _recipeData!["imageUrl"],
+          title: _recipeData!["title"],
+          portion: _recipeData!["portion"],
+          duration: _recipeData!["duration"],
+        ),
+        SizedBox(height: AppSizes.large),
+        textListSection(
+          items: ingredients,
+          title: "Bahan-bahan",
+        ),
+        SizedBox(height: AppSizes.base),
+        textListSection(
+          items: steps,
+          title: "Langkah-langkah",
+          numbered: true,
+        ),
+        SizedBox(height: AppSizes.doubleExtraLarge),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: nutritions
+                .map<Widget>(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: nutritionCapsule(
+                      label: item.label,
+                      value: item.value,
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -92,7 +169,9 @@ Widget _headerRecipe({
     children: [
       CircleAvatar(
         radius: 32,
-        backgroundImage: AssetImage(imageUrl),
+        backgroundImage: imageUrl.startsWith('http')
+            ? NetworkImage(imageUrl)
+            : AssetImage(imageUrl) as ImageProvider,
         backgroundColor: AppColors.textSecondary,
       ),
 

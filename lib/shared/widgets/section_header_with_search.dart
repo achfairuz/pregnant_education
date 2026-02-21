@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pregnant_education/core/constants/app_assets.dart';
 import 'package:pregnant_education/core/themes/app_colors.dart';
 import 'package:pregnant_education/core/themes/app_padding.dart';
 import 'package:pregnant_education/core/themes/app_sizes.dart';
@@ -11,12 +10,14 @@ class SectionHeaderWithSearch extends StatefulWidget {
   final String subtitle;
   final String hintText;
   final String icon;
+  final Function(String)? onSearchChanged;
   const SectionHeaderWithSearch({
     super.key,
     this.title,
     required this.subtitle,
     this.hintText = 'Search',
     required this.icon,
+    this.onSearchChanged,
   });
 
   @override
@@ -31,6 +32,11 @@ class _SectionHeaderWithSearchState extends State<SectionHeaderWithSearch> {
   void initState() {
     super.initState();
     _controller = TextEditingController();
+    _controller.addListener(() {
+      if (widget.onSearchChanged != null) {
+        widget.onSearchChanged!(_controller.text);
+      }
+    });
   }
 
   @override
@@ -60,7 +66,7 @@ class _SectionHeaderWithSearchState extends State<SectionHeaderWithSearch> {
             icon: widget.icon,
           ),
           const SizedBox(height: AppSizes.large),
-          searchInputCustom(controller: _controller, hintText: widget.hintText),
+          searchInputCustom(controller: _controller, hintText: widget.hintText, onClear: () => _controller.clear(),),
         ],
       ),
     );

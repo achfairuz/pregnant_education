@@ -22,7 +22,7 @@ Widget textListSection({
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                numbered ? '${index + 1}. ' : '• ',
+                numbered ? '${index + 1}. ' : '',
                 style: AppTextStyle.caption,
               ),
               Expanded(child: Text(text, style: AppTextStyle.caption)),

@@ -60,14 +60,16 @@ final appRouter = GoRouter(
       path: AppRoutes.detailEducation,
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-        return DetailEducationPage(id: id);
+        final data = state.extra as Map<String, dynamic>? ?? {};
+        return DetailEducationPage(id: id, data: data);
       },
     ),
     GoRoute(
       path: AppRoutes.detailRecipe,
       builder: (context, state) {
         final id = state.pathParameters['id']!;
-        return DetailRecipePage(id: id);
+        final data = state.extra as Map<String, dynamic>? ?? {};
+        return DetailRecipePage(id: id, data: data);
       },
     ),
   ],

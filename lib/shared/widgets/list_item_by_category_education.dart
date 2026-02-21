@@ -6,12 +6,12 @@ import 'package:pregnant_education/core/themes/app_text_style.dart';
 import 'package:pregnant_education/shared/helpers/html_excerpt_helper.dart';
 import 'package:pregnant_education/shared/helpers/limit_words_helper.dart';
 
-class ListItemByCategory extends StatefulWidget {
+class ListItemByCategoryEducation extends StatefulWidget {
   final String categoryName;
   final List<Map<String, dynamic>> data;
   final String prefixDetailPage;
 
-  const ListItemByCategory({
+  const ListItemByCategoryEducation({
     super.key,
     required this.categoryName,
     required this.data,
@@ -19,10 +19,10 @@ class ListItemByCategory extends StatefulWidget {
   });
 
   @override
-  State<ListItemByCategory> createState() => _ListItemByCategoryState();
+  State<ListItemByCategoryEducation> createState() => _ListItemByCategoryEducationState();
 }
 
-class _ListItemByCategoryState extends State<ListItemByCategory> {
+class _ListItemByCategoryEducationState extends State<ListItemByCategoryEducation> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -45,6 +45,7 @@ class _ListItemByCategoryState extends State<ListItemByCategory> {
                     description: item['description'] ?? '',
                     imageUrl: item['imageUrl'] ?? '',
                     prefixDetailPage: widget.prefixDetailPage,
+                    data: item,
                   );
                 },
               )
@@ -71,6 +72,7 @@ Widget _listCard({
   required String id,
   required String title,
   required String prefixDetailPage,
+  required Map<String, dynamic> data,
   String? description,
   String imageUrl = '',
 }) {
@@ -80,22 +82,35 @@ Widget _listCard({
       child: ListTile(
         leading: CircleAvatar(
           radius: 30,
-          backgroundImage: AssetImage(imageUrl),
+          backgroundImage: _getImageProvider(imageUrl),
           backgroundColor: Colors.grey[200],
+          onBackgroundImageError: (_, __) {},
         ),
         title: Text(title),
         subtitle: (description != null && description.isNotEmpty)
             ? Text(
                 extractParagraphText(limitWords(description, 15)),
                 textAlign: TextAlign.justify,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               )
             : null,
 
         trailing: const Icon(Icons.arrow_forward),
         onTap: () {
-          GoRouter.of(context).push('$prefixDetailPage/detail/$id');
+          GoRouter.of(context).push('$prefixDetailPage/detail/$id', extra: data);
         },
       ),
     ),
   );
+}
+
+ImageProvider _getImageProvider(String imageUrl) {
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return NetworkImage(imageUrl);
+  } else if (imageUrl.isNotEmpty) {
+    return AssetImage(imageUrl);
+  } else {
+    return const AssetImage('assets/images/icons/placeholder.png');
+  }
 }
