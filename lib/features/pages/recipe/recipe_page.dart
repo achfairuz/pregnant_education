@@ -33,7 +33,7 @@ class _RecipePageState extends State<RecipePage> {
       });
 
       final categories = await _repository.getCategoryRecipesAsMap();
-      
+
       setState(() {
         _categories = categories;
         _filteredCategories = categories;
@@ -101,7 +101,7 @@ class _RecipePageState extends State<RecipePage> {
                 data: _filteredCategories,
                 crossAxisCount: 3,
                 routePrefix: '/recipes/category',
-                routeShowAll: '/',
+                type: 'recipes',
               ),
           ],
         ),

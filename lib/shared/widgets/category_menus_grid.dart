@@ -9,13 +9,13 @@ class CategoryMenusGrid extends StatefulWidget {
   final List<Map<String, dynamic>> data;
   final String routePrefix;
   final int crossAxisCount;
-  final String routeShowAll;
+  final String type;
   const CategoryMenusGrid({
     super.key,
     required this.data,
     required this.routePrefix,
     required this.crossAxisCount,
-    required this.routeShowAll,
+    required this.type,
   });
 
   @override
@@ -25,6 +25,10 @@ class CategoryMenusGrid extends StatefulWidget {
 class _CategoryMenusGridState extends State<CategoryMenusGrid> {
   @override
   Widget build(BuildContext context) {
+    // Ambil maksimal 6 data
+    final limitedData = widget.data.length > 6
+        ? widget.data.take(6).toList()
+        : widget.data;
     return Padding(
       padding: AppPadding.screenPadding,
       child: Column(
@@ -35,7 +39,10 @@ class _CategoryMenusGridState extends State<CategoryMenusGrid> {
               Text('Categories', style: AppTextStyle.body),
               InkWell(
                 onTap: () {
-                  context.push(widget.routeShowAll);
+                  context.push(
+                    '/show-all/${widget.type}',
+                    extra: {'data': widget.data},
+                  );
                 },
                 child: Text('Show All', style: AppTextStyle.body),
               ),
@@ -45,7 +52,7 @@ class _CategoryMenusGridState extends State<CategoryMenusGrid> {
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemCount: widget.data.length,
+            itemCount: limitedData.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: widget.crossAxisCount,
               mainAxisSpacing: AppSizes.large,
@@ -74,7 +81,7 @@ class _CategoryCard extends StatelessWidget {
   final String name;
   final String imageUrl;
   final String routePrefix;
-  final Map<String, dynamic>  data;
+  final Map<String, dynamic> data;
 
   const _CategoryCard({
     required this.id,
@@ -130,16 +137,14 @@ class _CategoryCard extends StatelessWidget {
               child: CircularProgressIndicator(
                 value: loadingProgress.expectedTotalBytes != null
                     ? loadingProgress.cumulativeBytesLoaded /
-                        loadingProgress.expectedTotalBytes!
+                          loadingProgress.expectedTotalBytes!
                     : null,
               ),
             ),
           );
         },
-        errorBuilder: (_, __, ___) => const Icon(
-          Icons.image_not_supported,
-          size: 60,
-        ),
+        errorBuilder: (_, __, ___) =>
+            const Icon(Icons.image_not_supported, size: 60),
       );
     } else {
       return Image.asset(
@@ -147,10 +152,8 @@ class _CategoryCard extends StatelessWidget {
         width: 60,
         height: 60,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => const Icon(
-          Icons.image_not_supported,
-          size: 60,
-        ),
+        errorBuilder: (_, __, ___) =>
+            const Icon(Icons.image_not_supported, size: 60),
       );
     }
   }

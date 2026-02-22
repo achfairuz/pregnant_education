@@ -5,6 +5,7 @@ import 'package:pregnant_education/features/pages/recipe/detail_recipe_page.dart
 import 'package:pregnant_education/features/pages/recipe/recipe_by_category/recipe_by_category_page.dart';
 import 'package:pregnant_education/features/pages/recipe/recipe_page.dart';
 import 'package:pregnant_education/shared/layouts/shell_layout.dart';
+import 'package:pregnant_education/shared/widgets/categoryPage/show_all_category_page.dart';
 
 import '../../features/pages/education/education_page.dart';
 import '../../features/pages/scan/scan_page.dart';
@@ -21,6 +22,16 @@ final appRouter = GoRouter(
         GoRoute(
           path: AppRoutes.scan,
           builder: (context, state) => const ScanPage(),
+        ),
+        GoRoute(
+          path: AppRoutes.showAll,
+          builder: (context, state) {
+            final type = state.pathParameters['type'] ?? '';
+
+            final extra = state.extra as Map<String, dynamic>?;
+
+            return ShowAllCategoryPage(type: type, data: extra?['data'] ?? []);
+          },
         ),
         GoRoute(
           path: AppRoutes.recipes,

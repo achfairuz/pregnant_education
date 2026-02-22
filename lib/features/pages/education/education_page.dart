@@ -33,7 +33,7 @@ class _EducationPageState extends State<EducationPage> {
       });
 
       final categories = await _repository.getCategoryEducationAsMap();
-      
+
       setState(() {
         _categories = categories;
         _filteredCategories = categories;
@@ -103,7 +103,7 @@ class _EducationPageState extends State<EducationPage> {
                 data: _filteredCategories,
                 routePrefix: '/education/category',
                 crossAxisCount: 3,
-                routeShowAll: '/education/category',
+                type: 'education',
               ),
           ],
         ),

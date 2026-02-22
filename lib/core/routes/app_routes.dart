@@ -9,5 +9,7 @@ class AppRoutes {
 
   static const itemByCategory = 'category/:id/:name';
 
+  static const String showAll = '/show-all/:type';
+
   static const List<String> bottomNavRoutes = [education, scan, recipes];
 }
