@@ -1,16 +1,55 @@
-# pregnant_education
+# 🤰 Pregnant Education Mobile App
 
-A new Flutter project.
+Pregnant Education is a modern Flutter-based mobile application designed to provide structured educational content, healthy recipes, and interactive tools for pregnant mothers.
 
-## Getting Started
+This project is built with scalability, clean architecture principles, and production-readiness in mind, making it suitable for company portfolios and professional showcases.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 📱 Overview
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Pregnant Education delivers categorized learning materials and curated nutritional recipes through a clean and responsive mobile interface.  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The application focuses on:
+
+- User-friendly navigation
+- Organized content structure
+- Scalable architecture
+- Maintainable and reusable components
+
+---
+
+## ✨ Key Features
+
+- 📚 Structured Education Categories
+- 🍲 Healthy Recipe Collections
+- 🔍 Category Filtering & Browsing
+- 📷 QR Code Scanner Integration
+- 📄 Detailed Content Pages
+- 📊 Dynamic Category Grid System
+- 🔄 Show All Categories View
+- 📱 Fully Responsive UI
+- 🎨 Custom Theming System
+
+---
+
+## 🏗 Architecture & Design Principles
+
+- Modular feature-based folder structure
+- Clear separation of concerns (core, features, shared)
+- Reusable UI components
+- Clean navigation management
+- Optimized screen-to-screen data passing
+- Scalable foundation for backend integration
+
+---
+
+## 🛠 Technology Stack
+
+- Flutter
+- Dart
+- GoRouter (Navigation)
+- Custom Theming System
+- Responsive Layout Design
+
+---
