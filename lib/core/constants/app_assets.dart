@@ -25,4 +25,9 @@ class AppAssets {
   static const String modelNagasari = 'assets/3d_models/nagasari.glb';
   static const String modelBuburKacangIjo = 'assets/3d_models/kacangijo.glb';
   // =================== 3D Models ===================
+
+  // =================== Author ===================
+  static const String authorPhoto = 'assets/images/profile/author.jpeg';
+  static const String defaultAuthorPhoto = 'assets/images/profile/default.png';
+  // =================== Author ===================
 }

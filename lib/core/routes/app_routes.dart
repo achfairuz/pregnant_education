@@ -12,4 +12,6 @@ class AppRoutes {
   static const String showAll = '/show-all/:type';
 
   static const List<String> bottomNavRoutes = [education, scan, recipes];
+
+  static const about = '/about';
 }

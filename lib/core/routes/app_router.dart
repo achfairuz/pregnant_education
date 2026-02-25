@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:pregnant_education/features/pages/about/about_page.dart';
 import 'package:pregnant_education/features/pages/education/detail_education_page.dart';
 import 'package:pregnant_education/features/pages/education/education_by_category_page/education_by_category_page.dart';
 import 'package:pregnant_education/features/pages/recipe/detail_recipe_page.dart';
@@ -81,6 +82,12 @@ final appRouter = GoRouter(
         final id = state.pathParameters['id']!;
         final data = state.extra as Map<String, dynamic>? ?? {};
         return DetailRecipePage(id: id, data: data);
+      },
+    ),
+    GoRoute(
+      path: AppRoutes.about,
+      builder: (context, state) {
+        return AboutPage();
       },
     ),
   ],

@@ -11,6 +11,7 @@ class AppBottomNavbar extends StatelessWidget {
   int _currentIndex() {
     if (location.startsWith(AppRoutes.scan)) return 1;
     if (location.startsWith(AppRoutes.recipes)) return 2;
+    if (location.startsWith(AppRoutes.about)) return 3;
     return 0;
   }
 
@@ -44,6 +45,12 @@ class AppBottomNavbar extends StatelessWidget {
             label: 'Resep',
             active: index == 2,
             onTap: () => context.go(AppRoutes.recipes),
+          ),
+          _Item(
+            icon: Icons.info_outline,
+            label: 'Tentang',
+            active: index == 3,
+            onTap: () => context.push(AppRoutes.about),
           ),
         ],
       ),
