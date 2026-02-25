@@ -18,11 +18,11 @@ class AppAssets {
   static const String iconNagasari = 'assets/images/icons/15.png';
 
   // =================== 3D Models ===================
-  static const String modelMenu1 = 'assets/3d_models/menu_1.glb';
+  static const String modelMenu1 = 'assets/3d_models/menu1.glb';
   static const String modelNasiLele = 'assets/3d_models/nasi_lele.glb';
-  static const String modelMenu2 = 'assets/3d_models/menu_2_finish.glb';
-  static const String modelMenu3 = 'assets/3d_models/menu_3_fix_glb.glb';
-  static const String modelNagasari = 'assets/3d_models/nagasari_fix_glb.glb';
-  static const String modelBuburKacangIjo = 'assets/3d_models/kacang_ijo.glb';
+  static const String modelMenu2 = 'assets/3d_models/menu2.glb';
+  static const String modelMenu3 = 'assets/3d_models/menu3.glb';
+  static const String modelNagasari = 'assets/3d_models/nagasari.glb';
+  static const String modelBuburKacangIjo = 'assets/3d_models/kacangijo.glb';
   // =================== 3D Models ===================
 }
