@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:showcaseview/showcaseview.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_3d_controller/flutter_3d_controller.dart';
@@ -21,6 +22,9 @@ class ScanPage extends StatefulWidget {
 }
 
 class _ScanPageState extends State<ScanPage> {
+  final GlobalKey _scanAreaKey = GlobalKey();
+  final GlobalKey _galleryKey = GlobalKey();
+  final GlobalKey _helpButtonKey = GlobalKey();
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   QRViewController? controller;
   QrCodeType? detectedQrType;
@@ -34,6 +38,11 @@ class _ScanPageState extends State<ScanPage> {
     super.initState();
     _checkPermission();
     _3dController = Flutter3DController();
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   ShowCaseWidget.of(
+    //     context,
+    //   ).startShowCase([_scanAreaKey, _galleryKey, _helpButtonKey]);
+    // });
   }
 
   Future<void> _checkPermission() async {
@@ -54,31 +63,45 @@ class _ScanPageState extends State<ScanPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      extendBodyBehindAppBar: true, // Optional, for full screen AR feel
-      body: !isPermissionGranted
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Camera permission is required'),
-                  ElevatedButton(
-                    onPressed: _checkPermission,
-                    child: const Text('Grant Permission'),
+    bool _tutorialStarted = false;
+    return ShowCaseWidget(
+      builder: (context) {
+        if (!_tutorialStarted) {
+          _tutorialStarted = true;
+
+          Future.delayed(const Duration(milliseconds: 600), () {
+            ShowCaseWidget.of(
+              context,
+            ).startShowCase([_helpButtonKey, _galleryKey, _scanAreaKey]);
+          });
+        }
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          body: !isPermissionGranted
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text('Camera permission is required'),
+                      ElevatedButton(
+                        onPressed: _checkPermission,
+                        child: const Text('Grant Permission'),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
-          : Stack(
-              children: [
-                _buildQrView(context),
-                if (detectedQrType == null) _buildBottomActions(),
-                if (detectedQrType != null) _build3dView(),
-                if (detectedQrType != null) _buildButtonMenu(),
-                if (detectedQrType != null) _buildCapsuleMenu(),
-                if (detectedQrType != null) _buildControls(),
-              ],
-            ),
+                )
+              : Stack(
+                  children: [
+                    _buildQrView(context),
+                    if (detectedQrType == null) _buildBottomActions(),
+                    if (detectedQrType != null) _build3dView(),
+                    if (detectedQrType != null) _buildButtonMenu(),
+                    if (detectedQrType != null) _buildCapsuleMenu(),
+                    if (detectedQrType != null) _buildControls(),
+                  ],
+                ),
+        );
+      },
     );
   }
 
@@ -89,19 +112,30 @@ class _ScanPageState extends State<ScanPage> {
     // When 3D model is shown, overlay is removed (passed as null or empty shape)
     // However, QRView overlay parameter is nullable.
 
-    return QRView(
-      key: qrKey,
-      onQRViewCreated: _onQRViewCreated,
-      overlay: detectedQrType == null
-          ? QrScannerOverlayShape(
-              borderColor: Colors.red,
-              borderRadius: 10,
-              borderLength: 30,
-              borderWidth: 10,
-              cutOutSize: scanArea,
-            )
-          : null, // Remove overlay when model is shown
-      onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
+    return Showcase(
+      key: _scanAreaKey,
+      title: "Scan QR Code",
+      description: "Arahkan kamera ke QR Code untuk melihat visualisasi AR.",
+      titleTextStyle: const TextStyle(
+        fontSize: 14,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+      ),
+      descTextStyle: const TextStyle(fontSize: 12, color: Colors.black),
+      child: QRView(
+        key: qrKey,
+        onQRViewCreated: _onQRViewCreated,
+        overlay: detectedQrType == null
+            ? QrScannerOverlayShape(
+                borderColor: Colors.red,
+                borderRadius: 10,
+                borderLength: 30,
+                borderWidth: 10,
+                cutOutSize: scanArea,
+              )
+            : null, // Remove overlay when model is shown
+        onPermissionSet: (ctrl, p) => _onPermissionSet(context, ctrl, p),
+      ),
     );
   }
 
@@ -216,7 +250,10 @@ class _ScanPageState extends State<ScanPage> {
                               ),
                             ),
                             SizedBox(height: 10),
-                            Text(bahan['description'] ?? ""),
+                            Text(
+                              bahan['description'] ?? "",
+                              textAlign: TextAlign.justify,
+                            ),
                             if (bahan['capsule_data'] != null &&
                                 (bahan['capsule_data'] as List).isNotEmpty) ...[
                               SizedBox(height: 24),
@@ -334,22 +371,44 @@ class _ScanPageState extends State<ScanPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          ElevatedButton.icon(
-            onPressed: _pickFromGallery,
-            icon: const Icon(Icons.photo_library),
-            label: const Text('Galeri'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+          Showcase(
+            key: _galleryKey,
+            title: "Galeri",
+            description:
+                "Pilih gambar QR dari galeri jika sudah menyimpan QR Code.",
+            titleTextStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+            descTextStyle: const TextStyle(fontSize: 12),
+            child: ElevatedButton.icon(
+              onPressed: _pickFromGallery,
+              icon: const Icon(Icons.photo_library),
+              label: const Text('Galeri'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+              ),
             ),
           ),
-          ElevatedButton.icon(
-            onPressed: _showGuideSheet,
-            icon: const Icon(Icons.info_outline),
-            label: const Text('Petunjuk'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+          Showcase(
+            key: _helpButtonKey,
+            title: "Download QR Code",
+            description:
+                "Klik tombol ini untuk mendownload QR Code menu yang bisa kamu scan.",
+            titleTextStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+            descTextStyle: const TextStyle(fontSize: 12),
+            child: ElevatedButton.icon(
+              onPressed: _showGuideSheet,
+              icon: const Icon(Icons.info_outline),
+              label: const Text('Petunjuk'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black,
+              ),
             ),
           ),
         ],
@@ -426,29 +485,29 @@ class _ScanPageState extends State<ScanPage> {
   void _showGuideSheet() {
     final downloadItems = [
       {
-        'label': 'Menu 1',
+        'label': 'Makanan Utama 1',
         'asset': 'assets/images/qrcode/menu_1.png',
         'fileName': 'menu_1_qr',
       },
       {
-        'label': 'Menu 2',
+        'label': 'Makanan Utama 2',
         'asset': 'assets/images/qrcode/menu_2.png',
         'fileName': 'menu_2_qr',
       },
       {
-        'label': 'Menu 3',
+        'label': 'Makanan Utama 3',
         'asset': 'assets/images/qrcode/menu_3.png',
         'fileName': 'menu_3_qr',
       },
       {
-        'label': 'Nagasari',
-        'asset': 'assets/images/qrcode/nagasari.png',
-        'fileName': 'nagasari_qr',
-      },
-      {
-        'label': 'Bubur Kacang Ijo',
+        'label': 'Makanan Selingan 1',
         'asset': 'assets/images/qrcode/bubur_kacang_ijo.png',
         'fileName': 'bubur_kacang_ijo_qr',
+      },
+      {
+        'label': 'Makanan Selingan 2',
+        'asset': 'assets/images/qrcode/nagasari.png',
+        'fileName': 'nagasari_qr',
       },
     ];
 

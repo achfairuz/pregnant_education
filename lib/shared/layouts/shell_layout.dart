@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:showcaseview/showcaseview.dart';
 import '../widgets/app_bottom_navbar.dart';
 
 class ShellLayout extends StatelessWidget {
@@ -9,11 +10,13 @@ class ShellLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(16),
-        child: AppBottomNavbar(location: location),
+    return ShowCaseWidget(
+      builder: (context) => Scaffold(
+        body: child,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16),
+          child: AppBottomNavbar(location: location),
+        ),
       ),
     );
   }
