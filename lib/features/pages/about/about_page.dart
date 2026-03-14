@@ -136,7 +136,7 @@ class AboutPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Website Si Cerdas",
+            "Website Si-Cerdas",
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
