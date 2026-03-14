@@ -211,9 +211,11 @@ class AboutPage extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              onPressed: null,
-              icon: Icon(Icons.menu_book),
-              label: Text("Segera Hadir"),
+              onPressed: () => _launchURL(
+                "https://drive.google.com/drive/folders/1vzMxUZQYuHNk_xtG3arQC1D2LkqGr-aL",
+              ),
+              icon: const Icon(Icons.download),
+              label: const Text("Download E-Book"),
             ),
           ),
         ],

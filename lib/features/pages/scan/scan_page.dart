@@ -153,18 +153,19 @@ class _ScanPageState extends State<ScanPage> {
 
   Future<void> _handleQrCode(String code) async {
     try {
+      // STOP narasi lama dulu
+      await TtsHelper.stop();
+
       final type = QrCodeTypeExtension.fromString(code);
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
+
       setState(() {
         detectedQrType = type;
       });
     } catch (e) {
       debugPrint('Invalid QR Code: $code');
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('QR Code Tidak Valid')));
@@ -630,11 +631,13 @@ class _ScanPageState extends State<ScanPage> {
     }
   }
 
-  void _resetScan() {
+  void _resetScan() async {
+    await TtsHelper.stop();
+
     setState(() {
       detectedQrType = null;
     });
-    // Ensure camera is active (it should be, but just in case)
+
     controller?.resumeCamera();
   }
 
@@ -642,6 +645,7 @@ class _ScanPageState extends State<ScanPage> {
   void dispose() {
     controller?.dispose();
     _barcodeScanner.close();
+    TtsHelper.stop();
     super.dispose();
   }
 }
