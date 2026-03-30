@@ -2,23 +2,19 @@ class EducationByCategoryResponse {
   final String status;
   final EducationPaginationData data;
 
-  EducationByCategoryResponse({
-    required this.status,
-    required this.data,
-  });
+  EducationByCategoryResponse({required this.status, required this.data});
 
   factory EducationByCategoryResponse.fromJson(Map<String, dynamic> json) {
     return EducationByCategoryResponse(
       status: json['status'] as String,
-      data: EducationPaginationData.fromJson(json['data'] as Map<String, dynamic>),
+      data: EducationPaginationData.fromJson(
+        json['data'] as Map<String, dynamic>,
+      ),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'status': status,
-      'data': data.toJson(),
-    };
+    return {'status': status, 'data': data.toJson()};
   }
 }
 
@@ -103,6 +99,7 @@ class Education {
   final String createdAt;
   final String updatedAt;
   final String slug;
+  final String? link;
 
   Education({
     required this.id,
@@ -113,6 +110,7 @@ class Education {
     required this.createdAt,
     required this.updatedAt,
     required this.slug,
+    this.link,
   });
 
   factory Education.fromJson(Map<String, dynamic> json) {
@@ -125,6 +123,7 @@ class Education {
       createdAt: json['created_at'] as String,
       updatedAt: json['updated_at'] as String,
       slug: json['slug'] as String,
+      link: json['link'] as String?,
     );
   }
 
@@ -138,6 +137,7 @@ class Education {
       'created_at': createdAt,
       'updated_at': updatedAt,
       'slug': slug,
+      'link': link,
     };
   }
 
@@ -149,6 +149,7 @@ class Education {
       'imageUrl': imageUrl,
       'description': description,
       'slug': slug,
+      'link': link,
     };
   }
 }
@@ -158,11 +159,7 @@ class PaginationLink {
   final String label;
   final bool active;
 
-  PaginationLink({
-    this.url,
-    required this.label,
-    required this.active,
-  });
+  PaginationLink({this.url, required this.label, required this.active});
 
   factory PaginationLink.fromJson(Map<String, dynamic> json) {
     return PaginationLink(
@@ -173,10 +170,6 @@ class PaginationLink {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'url': url,
-      'label': label,
-      'active': active,
-    };
+    return {'url': url, 'label': label, 'active': active};
   }
 }

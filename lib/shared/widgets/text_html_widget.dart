@@ -66,9 +66,12 @@ class _TextHtmlWidgetState extends State<TextHtmlWidget> {
 
         /// STYLE TABLE
         "table": Style(
+          alignment: Alignment.centerLeft,
+          display: Display.flex,
+
           margin: Margins.symmetric(vertical: 16),
           border: Border.all(color: Colors.grey.shade300),
-          width: Width(375, Unit.percent),
+          width: Width(300, Unit.percent),
         ),
 
         "td": Style(
